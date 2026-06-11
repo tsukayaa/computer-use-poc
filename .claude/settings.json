@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:ai.google.dev)",
+      "WebFetch(domain:github.com)",
+      "Bash(git clone *)",
+      "Bash(playwright install *)",
+      "Bash(gh issue *)"
+    ]
+  }
+}
