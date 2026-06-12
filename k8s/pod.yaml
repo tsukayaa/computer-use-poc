@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: computer-use-poc
+  labels:
+    app: computer-use-poc
+spec:
+  restartPolicy: Never
+  containers:
+    - name: agent
+      # Ganti dengan path image hasil push (Artifact Registry / GCR)
+      image: REGION-docker.pkg.dev/PROJECT_ID/REPO/computer-use-poc:latest
+      # Jalanin script, lalu sleep biar pod tetap hidup buat `kubectl cp` screenshot.
+      command: ["/bin/sh", "-c"]
+      args:
+        - "python orchestrator.py --user 1; echo '=== DONE, pod sleep 1h buat kubectl cp ==='; sleep 3600"
+      env:
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: gemini-api-key
+              key: GEMINI_API_KEY
+        - name: PLAYWRIGHT_HEADLESS
+          value: "true"
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "1"
+          memory: "2Gi"

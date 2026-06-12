@@ -1,6 +1,2 @@
-username,password,first_name,last_name,zipcode
-standard_user,secret_sauce,Budi,Santoso,10210
-problem_user,secret_sauce,Siti,Rahayu,40132
-performance_glitch_user,secret_sauce,Ahmad,Fauzi,60271
-error_user,secret_sauce,Dewi,Kusuma,55122
-visual_user,secret_sauce,Reza,Pratama,20111
+username,password
+standard_user,secret_sauce

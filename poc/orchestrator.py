@@ -8,12 +8,33 @@ from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent.parent / "computer-use-preview" / ".env")
 
-os.environ["PLAYWRIGHT_HEADLESS"] = "false"
+# Headless dikontrol via env (GKE set "true"). Default false buat run lokal.
+os.environ.setdefault("PLAYWRIGHT_HEADLESS", "false")
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "computer-use-preview"))
 
 from agent import BrowserAgent
 from computers import PlaywrightComputer
+from computers.playwright import playwright as pw
+
+# --- Screenshot capture ---------------------------------------------------
+# Tiap step agent (current_state) ngehasilin PNG. Kita dump ke disk biar
+# bisa diintip walau jalan headless di GKE. State capture per-run di sini.
+SHOTS_ROOT = Path(__file__).parent / "shots"
+_capture = {"dir": None, "step": 0}
+
+_orig_current_state = pw.PlaywrightComputer.current_state
+
+def _capturing_current_state(self):
+    state = _orig_current_state(self)
+    if _capture["dir"] is not None:
+        _capture["step"] += 1
+        fname = _capture["dir"] / f"step_{_capture['step']:04d}.png"
+        fname.write_bytes(state.screenshot)
+    return state
+
+pw.PlaywrightComputer.current_state = _capturing_current_state
+# -------------------------------------------------------------------------
 
 SCREEN_SIZE = (1440, 900)
 MODEL = "gemini-2.5-computer-use-preview-10-2025"
@@ -21,39 +42,35 @@ TARGET_URL = "https://www.saucedemo.com"
 
 
 def build_task(user: dict) -> str:
-    return f"""Complete a full purchase on saucedemo.com using the credentials and checkout details below.
+    return f"""Log in to the web application and report what is on the page after login.
 
 Credentials:
   Username : {user['username']}
   Password : {user['password']}
 
-Checkout details:
-  First Name : {user['first_name']}
-  Last Name  : {user['last_name']}
-  Zip Code   : {user['zipcode']}
-
 Steps:
-1. Navigate to https://www.saucedemo.com
-2. Log in with the username and password above
-3. On the product listing page, scroll down to find 'Test.allTheThings() T-Shirt (Red)' and add it to the cart
-4. Click the cart icon (top right) to open the cart
-5. Click 'Checkout'
-6. Fill in the checkout form:
-   - First Name: {user['first_name']}
-   - Last Name: {user['last_name']}
-   - Zip/Postal Code: {user['zipcode']}
-7. Click 'Continue'
-8. Review the order summary, then click 'Finish'
-9. Confirm the 'Thank you for your order!' message appears
-10. Report success"""
+1. Navigate to {TARGET_URL}
+2. Enter the username above into the username field
+3. Enter the password above into the password field
+4. Click the login button
+5. Wait for the page after login to fully load
+6. Look at the page after login and describe what is on it: the main menu items, headings, and any visible content
+7. Report what you see as confirmation that login succeeded"""
 
 
 def run_user(user: dict, index: int):
     task = build_task(user)
 
+    # Folder capture per user: shots/user_1_standard_user/step_0001.png ...
+    run_dir = SHOTS_ROOT / f"user_{index + 1}_{user['username']}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    _capture["dir"] = run_dir
+    _capture["step"] = 0
+
     print(f"\n{'='*60}")
-    print(f"  User {index + 1}: {user['first_name']} {user['last_name']}")
+    print(f"  User {index + 1}")
     print(f"  Login: {user['username']}")
+    print(f"  Capture: {run_dir}")
     print(f"{'='*60}")
     print(f"\n[QUERY]\n{task}\n")
 
@@ -72,6 +89,7 @@ def run_user(user: dict, index: int):
 
     result = getattr(agent, "final_reasoning", "No final message")
     print(f"\n[RESULT] {result}\n")
+    print(f"[CAPTURE] {_capture['step']} screenshot tersimpan di {run_dir}\n")
 
 
 def main():

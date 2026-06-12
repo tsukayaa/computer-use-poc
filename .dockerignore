@@ -1,0 +1,8 @@
+.env
+**/.env
+.git
+.gitmodules
+__pycache__/
+**/__pycache__/
+*.pyc
+poc/shots/

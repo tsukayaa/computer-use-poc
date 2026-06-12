@@ -5,7 +5,15 @@
       "WebFetch(domain:github.com)",
       "Bash(git clone *)",
       "Bash(playwright install *)",
-      "Bash(gh issue *)"
+      "Bash(gh issue *)",
+      "Bash(git submodule *)",
+      "Bash(cat .gitmodules)",
+      "Bash(ls computer-use-preview/.git)",
+      "Bash(cp -r computer-use-preview \"../_cup_backup_$\\(date +%s\\)\")",
+      "Read(//c/Users/User/Documents/WORK/**)",
+      "Bash(git rm *)",
+      "Bash(rm -rf computer-use-preview/.git)",
+      "Bash(git config *)"
     ]
   }
 }
