@@ -10,10 +10,10 @@ spec:
     - name: agent
       # Ganti dengan path image hasil push (Artifact Registry / GCR)
       image: REGION-docker.pkg.dev/PROJECT_ID/REPO/computer-use-poc:latest
-      # Jalanin script, lalu sleep biar pod tetap hidup buat `kubectl cp` screenshot.
+      # Pod idle. Kita exec masuk lalu jalanin orchestrator.py manual (kontrol timing demo).
       command: ["/bin/sh", "-c"]
       args:
-        - "python orchestrator.py --user 1; echo '=== DONE, pod sleep 1h buat kubectl cp ==='; sleep 3600"
+        - "echo 'Pod ready. Exec masuk lalu: cd /app/poc && python orchestrator.py --user 1'; sleep infinity"
       env:
         - name: GEMINI_API_KEY
           valueFrom:
