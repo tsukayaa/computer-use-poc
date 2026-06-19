@@ -81,11 +81,15 @@ class PlaywrightComputer(Computer):
         initial_url: str = "https://www.google.com",
         search_engine_url: str = "https://www.google.com",
         highlight_mouse: bool = False,
+        storage_state: str | None = None,
     ):
         self._initial_url = initial_url
         self._screen_size = screen_size
         self._search_engine_url = search_engine_url
         self._highlight_mouse = highlight_mouse
+        # Path ke file storage_state (cookie/session) hasil prelogin.
+        # Kalau di-set, browser mulai dalam keadaan sudah login.
+        self._storage_state = storage_state
 
     def _handle_new_page(self, new_page: playwright.sync_api.Page):
         """The Computer Use model only supports a single tab at the moment.
@@ -113,12 +117,16 @@ class PlaywrightComputer(Computer):
             ],
             headless=os.environ.get("PLAYWRIGHT_HEADLESS", "false").lower() == "true",
         )
-        self._context = self._browser.new_context(
-            viewport={
+        context_kwargs = {
+            "viewport": {
                 "width": self._screen_size[0],
                 "height": self._screen_size[1],
             }
-        )
+        }
+        # Muat cookie/session dari prelogin kalau ada -> browser sudah login.
+        if self._storage_state:
+            context_kwargs["storage_state"] = self._storage_state
+        self._context = self._browser.new_context(**context_kwargs)
         self._page = self._context.new_page()
         self._page.goto(self._initial_url)
 

@@ -4,3 +4,5 @@ __pycache__/
 .env.local
 .env
 poc/shots/
+poc/users.csv
+poc/auth/

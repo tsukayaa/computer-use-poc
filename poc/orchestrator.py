@@ -17,6 +17,8 @@ from agent import BrowserAgent
 from computers import PlaywrightComputer
 from computers.playwright import playwright as pw
 
+import prelogin
+
 # --- Screenshot capture ---------------------------------------------------
 # Tiap step agent (current_state) ngehasilin PNG. Kita dump ke disk biar
 # bisa diintip walau jalan headless di GKE. State capture per-run di sini.
@@ -39,27 +41,29 @@ pw.PlaywrightComputer.current_state = _capturing_current_state
 SCREEN_SIZE = (1440, 900)
 MODEL = "gemini-2.5-computer-use-preview-10-2025"
 TARGET_URL = "https://www.saucedemo.com"
+# URL halaman setelah login. Cookie session di-load lewat storage_state, tapi
+# beberapa app (spt saucedemo) tetap tampilkan login di root -> buka URL ini
+# langsung supaya agent mulai di halaman ter-autentikasi. Ganti untuk Prudential.
+POST_LOGIN_URL = "https://www.saucedemo.com/inventory.html"
 
 
 def build_task(user: dict) -> str:
-    return f"""Log in to the web application and report what is on the page after login.
-
-Credentials:
-  Username : {user['username']}
-  Password : {user['password']}
+    # NOTE: tidak ada password di prompt. Browser sudah login lewat prelogin
+    # (storage_state). Agent mulai dari halaman setelah login.
+    return f"""You are already logged in to the web application at {TARGET_URL}.
 
 Steps:
-1. Navigate to {TARGET_URL}
-2. Enter the username above into the username field
-3. Enter the password above into the password field
-4. Click the login button
-5. Wait for the page after login to fully load
-6. Look at the page after login and describe what is on it: the main menu items, headings, and any visible content
-7. Report what you see as confirmation that login succeeded"""
+1. Wait for the current page to fully load
+2. Look at the page and describe what is on it: the main menu items, headings, and any visible content
+3. Report what you see as confirmation that you are logged in"""
 
 
 def run_user(user: dict, index: int):
     task = build_task(user)
+
+    # Prelogin deterministik (Playwright murni): isi user+password, simpan
+    # cookie ke auth.json. Password TIDAK pernah masuk ke prompt AI / Google.
+    auth_path = prelogin.prelogin(user, index)
 
     # Folder capture per user: shots/user_1_standard_user/step_0001.png ...
     run_dir = SHOTS_ROOT / f"user_{index + 1}_{user['username']}"
@@ -74,9 +78,12 @@ def run_user(user: dict, index: int):
     print(f"{'='*60}")
     print(f"\n[QUERY]\n{task}\n")
 
+    # storage_state=auth_path -> browser mulai sudah login.
+    # initial_url=POST_LOGIN_URL -> agent mulai di halaman ter-autentikasi.
     computer = PlaywrightComputer(
         screen_size=SCREEN_SIZE,
-        initial_url=TARGET_URL,
+        initial_url=POST_LOGIN_URL,
+        storage_state=str(auth_path),
     )
 
     with computer as browser:

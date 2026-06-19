@@ -13,7 +13,10 @@
       "Read(//c/Users/User/Documents/WORK/**)",
       "Bash(git rm *)",
       "Bash(rm -rf computer-use-preview/.git)",
-      "Bash(git config *)"
+      "Bash(git config *)",
+      "Bash(cat .gitignore)",
+      "Bash(cat .dockerignore)",
+      "Bash(PLAYWRIGHT_HEADLESS=true python prelogin.py --user 1)"
     ]
   }
 }
