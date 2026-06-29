@@ -16,7 +16,26 @@
       "Bash(git config *)",
       "Bash(cat .gitignore)",
       "Bash(cat .dockerignore)",
-      "Bash(PLAYWRIGHT_HEADLESS=true python prelogin.py --user 1)"
+      "Bash(PLAYWRIGHT_HEADLESS=true python prelogin.py --user 1)",
+      "Bash(git checkout *)",
+      "Bash(python -c \"from google.genai import types; print\\([e for e in dir\\(types.Environment\\) if not e.startswith\\('_'\\)]\\)\")",
+      "Bash(python -c \"import pyautogui; print\\('pyautogui OK', pyautogui.size\\(\\)\\)\")",
+      "Bash(python -c \"import desktop_orchestrator; print\\('import OK'\\)\")",
+      "Bash(python -m py_compile sample_app.py desktop_orchestrator.py desktop_computer.py)",
+      "Bash(python -m py_compile desktop_computer.py desktop_orchestrator.py)",
+      "Bash(python -m py_compile sample_app_5250.py desktop_orchestrator_5250.py)",
+      "Bash(python -m py_compile agent.py)",
+      "Bash(python -m py_compile pru_llm.py)",
+      "Bash(python -c \"import httpx; print\\('httpx', httpx.__version__\\)\")",
+      "Bash(python -c \"import os; print\\('GEMINI_API_KEY in shell:', 'YES' if os.environ.get\\('GEMINI_API_KEY'\\) else 'NO'\\)\")",
+      "Bash(python \"C:/Users/User/AppData/Local/Temp/claude/c--Users-User-Documents-WORK-Computer-Use/b697d49c-1b58-48aa-acb8-3424b83a75b5/scratchpad/test_chat_completions.py\")",
+      "Bash(python \"C:/Users/User/AppData/Local/Temp/claude/c--Users-User-Documents-WORK-Computer-Use/b697d49c-1b58-48aa-acb8-3424b83a75b5/scratchpad/test_cu_via_openai.py\")",
+      "Bash(git commit *)",
+      "Bash(grep -E \"\\\\.env$|poc/auth/|poc/shots/|users\\\\.csv|__pycache__\")",
+      "Bash(git merge *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\User\\.claude\\projects\\c--Users-User-Documents-WORK-Computer-Use\\memory"
     ]
   }
 }
