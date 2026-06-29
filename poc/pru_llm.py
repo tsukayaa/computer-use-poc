@@ -16,9 +16,15 @@ Butuh: pip install httpx
 """
 import asyncio
 import os
+from pathlib import Path
 from typing import Any
 
 import httpx
+from dotenv import load_dotenv
+
+# Baca .env: cek poc/.env lalu computer-use-preview/.env.
+load_dotenv(Path(__file__).parent / ".env")
+load_dotenv(Path(__file__).parent.parent / "computer-use-preview" / ".env")
 
 PRU_LLM_URL = os.environ.get("PRU_LLM_URL")
 PRU_API_KEY = os.environ.get("PRU_API_KEY")

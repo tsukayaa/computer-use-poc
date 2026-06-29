@@ -32,7 +32,8 @@
       "Bash(python \"C:/Users/User/AppData/Local/Temp/claude/c--Users-User-Documents-WORK-Computer-Use/b697d49c-1b58-48aa-acb8-3424b83a75b5/scratchpad/test_cu_via_openai.py\")",
       "Bash(git commit *)",
       "Bash(grep -E \"\\\\.env$|poc/auth/|poc/shots/|users\\\\.csv|__pycache__\")",
-      "Bash(git merge *)"
+      "Bash(git merge *)",
+      "Bash(git ls-tree *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\User\\.claude\\projects\\c--Users-User-Documents-WORK-Computer-Use\\memory"
