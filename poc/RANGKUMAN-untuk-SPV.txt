@@ -1,0 +1,108 @@
+RANGKUMAN: Eksplorasi "Computer Use" untuk Underwriting
+Tanggal: 2026-06-29
+Bahasa: awam (untuk diskusi dengan SPV / tim terkait)
+
+====================================================================
+TUJUAN
+====================================================================
+Membuat AI/software yang bisa mengoperasikan aplikasi underwriting
+green-screen (IBM 5250 / AS-400, "Financial Underwriting by Contract")
+secara otomatis untuk SPAJ dengan batas nominal tertentu.
+Ide besar (dari pimpinan): "digital human underwriter" yang menaikkan
+produktivitas proses underwriting.
+
+====================================================================
+ADA 2 CARA SOFTWARE MENGONTROL APLIKASI
+====================================================================
+
+--------------------------------------------------------------------
+CARA 1: AI "melihat" screenshot lalu klik/ketik (Gemini computer-use)
+--------------------------------------------------------------------
+- Model: gemini-2.5-computer-use-preview.
+- Cara kerja: layar di-screenshot, AI menebak lokasi klik/ketik
+  (seperti manusia melihat layar).
+
+- Syarat teknis: HARUS lewat format Gemini "native" (endpoint
+  bernama :generateContent) + alat khusus "computer_use".
+
+- Temuan: lewat gateway kantor (prugenai) dengan format OpenAI biasa
+  (/chat/completions) DITOLAK oleh model. Sudah dites 3 cara, semua
+  error: "This model requires the use of the Computer Use tool".
+  -> Jadi /chat/completions TIDAK bisa dipakai untuk computer-use.
+
+- TEMUAN BARU (penting): di halaman dokumentasi gateway
+  (base_url + /docs, Swagger UI) ADA schema "GenerateContentRequest".
+  Ini tanda kuat gateway PUNYA endpoint native generateContent.
+  Kalau benar ada DAN alat "computer_use" diteruskan ke model,
+  maka CARA 1 BISA jalan di kantor. PERLU DIVERIFIKASI
+  (lihat bagian "YANG PERLU DICEK").
+
+- Catatan privasi: screenshot (berisi data nasabah) tetap dikirim ke
+  model Google Gemini (walau lewat gateway). Untuk DATA ASLI perlu
+  persetujuan legal/compliance. Untuk POC pakai DATA DUMMY.
+
+--------------------------------------------------------------------
+CARA 2: Software membaca TEKS layar langsung lalu mengetik
+--------------------------------------------------------------------
+- Tidak pakai screenshot, tidak pakai AI-vision, tidak kirim gambar
+  ke cloud. Lebih akurat dan lebih aman untuk data.
+
+- Syarat: aplikasi terminal harus punya semacam "colokan remote-control".
+
+- Temuan di laptop kantor:
+  * Aplikasi terminal yang dipakai = IBM i Access Client Solutions
+    (ACS, berbasis Java, file sesi ".hod"). ACS TIDAK punya colokan
+    itu (tidak ada fitur "EHLLAPI").
+  * Ada aplikasi terminal LAMA (PC5250 / IBM i Access for Windows)
+    yang file-nya masih tersisa di laptop dan PUNYA colokan itu --
+    TAPI tidak mau connect ke host dan produknya sudah usang
+    (deprecated). Jadi bukan untuk produksi.
+
+- Detail host yang SUDAH dipastikan:
+    nama host = IDNDEV
+    port      = 992
+    keamanan  = TLS/SSL
+    code page = 037
+    laptop BISA menjangkau host ini (koneksi sukses).
+
+- Plan B yang realistis: software connect LANGSUNG ke host
+  (IDNDEV:992) sebagai "terminal sendiri" (memakai library 5250
+  seperti tn5250j), membaca dan mengetik teks langsung.
+  Artinya si bot punya LOGIN AS-400 SENDIRI.
+  -> Ini SEJALAN dengan ide "money limit": batas otoritas
+     (limit approval) diberikan pada USER AS-400 milik bot.
+     Hasilnya: auditable, scalable, dan bot = pekerja mandiri,
+     bukan menumpang sesi manusia.
+
+- Konsekuensi: butuh bantuan tim AS-400 (membuat user khusus bot)
+  + sedikit development. Sudah TIDAK bisa dites sendiri di laptop.
+
+====================================================================
+YANG PERLU DICEK / DITANYAKAN
+====================================================================
+Ke tim gateway (prugenai) -- untuk CARA 1:
+  1. Apakah gateway punya endpoint Gemini NATIVE "generateContent"
+     (endpoint yang memakai schema "GenerateContentRequest")?
+     Apa path/URL lengkapnya?
+  2. Apakah endpoint itu meneruskan alat "computer_use" ke model?
+     (kalau ya, computer-use bisa dipakai di kantor)
+
+Ke tim AS-400 / SPV -- untuk CARA 2:
+  3. Bisakah dibuatkan 1 user AS-400 khusus "bot underwriter",
+     dengan batas otoritas (money limit), yang boleh login ke
+     host IDNDEV?
+
+Ke legal / compliance:
+  4. Untuk DATA ASLI nasabah: boleh tidak dikirim ke model Gemini
+     (via gateway prugenai)? (relevan untuk CARA 1)
+
+====================================================================
+REKOMENDASI
+====================================================================
+- CARA 1 (computer-use) menjadi MUNGKIN lagi JIKA endpoint native
+  generateContent benar ada di gateway -> cek dulu ini (paling cepat,
+  paling sedikit kerja).
+- CARA 2 (baca teks langsung) paling solid dan aman untuk produksi,
+  dan paling pas dengan visi "digital underwriter + money limit",
+  tapi butuh user AS-400 khusus + development -> libatkan tim AS-400.
+- POC apa pun: gunakan DATA DUMMY dulu sampai legal menyetujui.

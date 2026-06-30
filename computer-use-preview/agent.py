@@ -29,6 +29,7 @@ from rich.console import Console
 from rich.table import Table
 
 from computers import EnvState, Computer
+from llm_client import build_client
 
 MAX_RECENT_TURN_WITH_SCREENSHOTS = 3
 PREDEFINED_COMPUTER_USE_FUNCTIONS = [
@@ -73,30 +74,9 @@ class BrowserAgent:
         self._model_name = model_name
         self._verbose = verbose
         self.final_reasoning = None
-        # Custom LLM endpoint (mis. gateway internal "prugenai").
-        # Set LLM_BASE_URL -> semua call LLM lewat URL itu, bukan langsung
-        # ke generativelanguage.googleapis.com.
-        # Header tambahan (auth gateway dll) via LLM_EXTRA_HEADERS = JSON string.
-        http_options = None
-        base_url = os.environ.get("LLM_BASE_URL")
-        if base_url:
-            extra_headers = {}
-            raw_headers = os.environ.get("LLM_EXTRA_HEADERS")
-            if raw_headers:
-                import json
-                extra_headers = json.loads(raw_headers)
-            http_options = types.HttpOptions(
-                base_url=base_url,
-                headers=extra_headers or None,
-            )
-
-        self._client = genai.Client(
-            api_key=os.environ.get("GEMINI_API_KEY"),
-            vertexai=os.environ.get("USE_VERTEXAI", "0").lower() in ["true", "1"],
-            project=os.environ.get("VERTEXAI_PROJECT"),
-            location=os.environ.get("VERTEXAI_LOCATION"),
-            http_options=http_options,
-        )
+        # SATU base URL terpusat (gateway prugenai). Semua config LLM
+        # (base_url, header auth, key, Vertex) ada di llm_client.py.
+        self._client = build_client()
         self._contents: list[Content] = [
             Content(
                 role="user",

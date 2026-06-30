@@ -14,6 +14,7 @@ os.environ.setdefault("PLAYWRIGHT_HEADLESS", "false")
 sys.path.insert(0, str(Path(__file__).parent.parent / "computer-use-preview"))
 
 from agent import BrowserAgent
+from llm_client import DEFAULT_MODEL
 from computers import PlaywrightComputer
 from computers.playwright import playwright as pw
 
@@ -39,7 +40,7 @@ pw.PlaywrightComputer.current_state = _capturing_current_state
 # -------------------------------------------------------------------------
 
 SCREEN_SIZE = (1440, 900)
-MODEL = "gemini-2.5-computer-use-preview-10-2025"
+MODEL = DEFAULT_MODEL
 TARGET_URL = "https://www.saucedemo.com"
 # URL halaman setelah login. Cookie session di-load lewat storage_state, tapi
 # beberapa app (spt saucedemo) tetap tampilkan login di root -> buka URL ini

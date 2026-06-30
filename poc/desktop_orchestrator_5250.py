@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "computer-use-preview"))
 
 from google.genai import types
 from agent import BrowserAgent
+from llm_client import DEFAULT_MODEL
 from desktop_computer import DesktopComputer
 
 # --- Screenshot capture --------------------------------------------------
@@ -35,7 +36,7 @@ def _capturing_shot(self):
 DesktopComputer._shot = _capturing_shot
 # -------------------------------------------------------------------------
 
-MODEL = "gemini-2.5-computer-use-preview-10-2025"
+MODEL = DEFAULT_MODEL
 WINDOW_TITLE = "B - 5250 Display"
 
 TASK = """You are controlling a green-screen terminal application (IBM 5250 style)

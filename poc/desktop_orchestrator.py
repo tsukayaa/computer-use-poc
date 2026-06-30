@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "computer-use-preview"))
 
 from google.genai import types
 from agent import BrowserAgent
+from llm_client import DEFAULT_MODEL
 from desktop_computer import DesktopComputer
 
 # --- Screenshot capture (dump tiap _shot ke disk) ------------------------
@@ -39,7 +40,7 @@ def _capturing_shot(self):
 DesktopComputer._shot = _capturing_shot
 # -------------------------------------------------------------------------
 
-MODEL = "gemini-2.5-computer-use-preview-10-2025"
+MODEL = DEFAULT_MODEL
 
 WINDOW_TITLE = "Sample Form App"
 

@@ -33,7 +33,12 @@
       "Bash(git commit *)",
       "Bash(grep -E \"\\\\.env$|poc/auth/|poc/shots/|users\\\\.csv|__pycache__\")",
       "Bash(git merge *)",
-      "Bash(git ls-tree *)"
+      "Bash(git ls-tree *)",
+      "WebFetch(domain:blog.google)",
+      "Bash(python -m py_compile computer-use-preview/llm_client.py computer-use-preview/agent.py poc/pru_llm.py poc/orchestrator.py poc/desktop_orchestrator.py poc/desktop_orchestrator_5250.py)",
+      "Bash(python -c ' *)",
+      "Bash(python -m py_compile computer-use-preview/llm_client.py poc/pru_llm.py)",
+      "Bash(PRU_LLM_URL=http://x/root PRU_API_KEY=k PRU_APP_ID=a python -c ' *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\User\\.claude\\projects\\c--Users-User-Documents-WORK-Computer-Use\\memory"
